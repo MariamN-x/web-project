@@ -1,14 +1,14 @@
 const express = require('express');
+const passport = require('passport');
 const router = express.Router();
 const authController = require('../controllers/authController');
 
 // POST route for user signup
 router.post('/signup', authController.signup);
 
-// POST route for user login
-router.post('/login', authController.login);
+router.post('/login', authController.login, (req, res) => {
+    res.send('Login successful');
+});
 
-// POST route for user logout (if needed)
-router.post('/logout', authController.logout);
-
+router.get('/logout', authController.logout);
 module.exports = router;

@@ -5,7 +5,12 @@ const postForSaleSchema = new mongoose.Schema({
     description: { type: String, required: true },
     price: { type: Number, required: true },
     location: { type: String, required: true },
-    imagePath:{type: String, required: true}
+    imagePath:{type: String, required: true},
+    status: {
+        type: String,
+        enum: ['pending', 'approved', 'rejected'],
+        default: 'pending'
+    }
 }, { timestamps: true });
 
 

@@ -277,74 +277,23 @@
 }
 
 @media screen and (max-width: 600px) {
-  .sell1 .title h3 {
-      margin-left: 30px;
+  #background .title h1{
+    margin-top: 50px;
   }
-
-  .sell1 .sec2 {
-      height: 170vh;
-  }
-
-  .sell1 .sec3 {
-      height: 130vh;
-  }
-}
-
-@media (min-width: 576px) and (max-width: 767px) {
-  .sell1 .title h1 {
-      margin-right: 30px;
-  }
-
   .sell1 .title h3 {
       margin-left: 30px;
       margin-top: 100px;
   }
 
-  .sell1 .sec1 {
-      height: 180vh;
+  .sell1 .sec1{
+    height: 160vh;
   }
-
   .sell1 .sec2 {
-      height: 180vh;
+      height: 160vh;
   }
 
   .sell1 .sec3 {
-      height: 150vh;
-  }
-
-  .sell1 .block {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, 25rem);
-      gap: 1.5rem;
-      justify-content: center;
-      align-items: flex-start;
-      margin-left: 30px;
-      margin-right: 6px;
+      height: 110vh;
   }
 }
 
-@media (max-width: 575px) {
-  .sell1 .title h3 {
-      margin-left: 30px;
-      margin-top: 120px;
-  }
-
-  .sell1 .sec1 {
-      height: 170vh;
-  }
-}
-
-@media screen and (max-width: 1024px){
-  .sell1 .sec1 {
-    height: 60vh;
-}
-
-.sell1 .sec2 {
-    height: 60vh;
-}
-
-.sell1 .sec3 {
-    height: 30vh;
-}
-
-}  

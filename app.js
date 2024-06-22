@@ -5,6 +5,7 @@ const path = require('path');
 const livereload = require('livereload');
 const connectLiveReload = require('connect-livereload');
 const multer = require('multer');
+const session = require('express-session');
 const fs = require('fs');
 const app = express();
 const port = 3000;
@@ -17,6 +18,9 @@ const indexRoutes = require('./routes/userRoutes');
 const PostForSale = require("./models/PostForSale");
 const adminRoutes = require('./routes/admin');
 const MeetingRequest = require("./models/schedule"); 
+const passport = require('./passport-config');
+const Feedback = require("./models/feedback");
+
 
 // Middleware for live reload
 app.use(connectLiveReload());
@@ -28,6 +32,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/css', express.static(path.join(__dirname, 'public/css')));
 app.use('/img', express.static(path.join(__dirname, 'public/img')));
 app.use('/js', express.static(path.join(__dirname, 'public/js')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // Set view engine
 app.set('views', './views');
@@ -139,6 +145,10 @@ app.get('/privacy-policy.ejs', (req, res) => {
     res.render('privacy-policy', { title: 'Real Estate' });
 });
 
+app.get('/adminAgents.ejs', (req, res) => {
+    res.render('adminAgents', { title: 'Real Estate' });
+});
+
 const URL = "mongodb+srv://RealStateProject:F2TP4UiebwSv2zKA@databrs.fu7gdx6.mongodb.net/?retryWrites=true&w=majority&appName=DATABRS";
 
 // MongoDB connection
@@ -162,17 +172,7 @@ mongoose.connect(URL)
         console.log(err);
     });
 
-app.get('/sellRequests.ejs', async (req, res) => {
-    try {
-        const posts = await PostForSale.find({}) || []; // Ensure posts is an array
-        console.log('Posts:', posts); 
-        res.render('sellRequests', { title: 'Sell Requests', posts: posts });
-    } catch (err) {
-        console.error('Error fetching posts:', err);
-        res.status(500).send('Internal Server Error');
-    }
-});
-    
+
 // POST route to handle signup
 app.post('/signup', async (req, res) => {
     const { username, email, password } = req.body;
@@ -227,6 +227,8 @@ app.post('/index', (req, res) => {
         });
 });
 
+//===============================sell requests and posts======================================
+
 app.post('/submit-form', (req, res) => {
     const { title, description, price, location } = req.body;
 
@@ -249,7 +251,7 @@ app.post('/submit-form', (req, res) => {
                     if (err) {
                         return res.status(500).send(err);
                     }
-                    res.send('Form submitted successfully!');
+                    res.send('Form submitted successfully! waiting for admin response');
                 });
             } else {
                 res.send('Form submitted successfully!');
@@ -262,11 +264,10 @@ app.post('/submit-form', (req, res) => {
 });
 
 app.post('/admin/approve-post', (req, res) => {
-    const { postId } = req.body;
+    const postId = req.body.postId;
     PostForSale.findByIdAndUpdate(postId, { status: 'approved' }, { new: true })
         .then(updatedPost => {
-            console.log('Post approved:', updatedPost);
-            res.redirect('/sellRequests');
+            res.send('Post approved successfully');
         })
         .catch(err => {
             console.error('Error approving post:', err);
@@ -275,17 +276,69 @@ app.post('/admin/approve-post', (req, res) => {
 });
 
 app.post('/admin/reject-post', (req, res) => {
-    const { postId } = req.body;
+    const postId = req.body.postId;
     PostForSale.findByIdAndUpdate(postId, { status: 'rejected' }, { new: true })
         .then(updatedPost => {
-            console.log('Post rejected:', updatedPost);
-            res.redirect('/sellRequests');
+            res.send('Post rejected successfully');
         })
         .catch(err => {
             console.error('Error rejecting post:', err);
             res.status(500).send('Internal Server Error');
         });
 });
+
+app.get('/sellRequests.ejs', async (req, res) => {
+    try {
+        const posts = await PostForSale.find({}) || []; 
+        console.log('Posts:', posts); 
+        res.render('sellRequests', { title: 'Sell Requests', posts: posts });
+    } catch (err) {
+        console.error('Error fetching posts:', err);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+//==========================feedback setion===========================
+
+app.post('/submit-feedback', async (req, res) => {
+    console.log('Received feedback submission:', req.body);
+
+    const { type, email, name, feedbackType, comment } = req.body;
+    const newFeedback = new Feedback({
+        type,
+        email,
+        name,
+        feedbackType,
+        comment
+    });
+
+    console.log('New feedback object:', newFeedback);
+
+    newFeedback.save()
+        .then(savedFeedback => {
+            console.log('Feedback saved successfully:', savedFeedback);
+            res.send('Form submitted successfully!');
+        })
+        .catch(err => {
+            console.error('Error saving feedback:', err);
+            res.status(500).send('Internal Server Error');
+        });
+});
+
+app.get('/clientFeedback.ejs', async (req, res) => {
+    try {
+        const feedbacks = await Feedback.find({}) || [];     
+        console.log("feedbacks: ",feedbacks)    
+        res.render('clientFeedback', { feedbacks: feedbacks });
+    } catch (err) {
+        console.error('Error fetching feedbacks:', err);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
+//============================================================================================
+
 
 // Import and use adminRoutes
 app.use('/admin', adminRoutes);
@@ -294,3 +347,19 @@ app.use('/admin', adminRoutes);
 app.use((req, res) => {
     res.status(404).send('Page not found');
 });
+
+
+// app.use(session({
+//     secret: 'your-secret-key',
+//     resave: false,
+//     saveUninitialized: false
+// }));
+// app.use(passport.initialize());
+// app.use(passport.session());
+// const authRoutes = require('./routes/authRoutes');
+// app.use('/auth', authRoutes);
+
+// const postRoutes = require('./routes/postRoutes'); 
+// app.use('/posts', postRoutes);
+
+
