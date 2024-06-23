@@ -1,12 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const fileUpload = require('express-fileupload');
-const path = require('path');
-const livereload = require('livereload');
-const connectLiveReload = require('connect-livereload');
 const multer = require('multer');
 const session = require('express-session');
 const fs = require('fs');
+const path = require('path');
+const livereload = require('livereload');
+const connectLiveReload = require('connect-livereload');
+
 const app = express();
 const port = 3000;
 
@@ -17,8 +18,6 @@ app.use(fileUpload());
 const indexRoutes = require('./routes/userRoutes');
 const PostForSale = require("./models/PostForSale");
 const adminRoutes = require('./routes/admin');
-const MeetingRequest = require("./models/schedule"); 
-const passport = require('./passport-config');
 const Feedback = require("./models/feedback");
 
 
@@ -137,9 +136,6 @@ app.get('/agent.ejs', (req, res) => {
     res.render('agent', { title: 'Real Estate' });
 });
 
-app.get('/payment.ejs', (req, res) => {
-    res.render('payment', { title: 'Real Estate' });
-});
 
 app.get('/privacy-policy.ejs', (req, res) => {
     res.render('privacy-policy', { title: 'Real Estate' });

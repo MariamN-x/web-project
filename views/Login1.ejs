@@ -9,19 +9,47 @@
 <body>
   <div class="login-container">
     <h1 class="hdngform">Login</h1>
-    <form class="logsignform" id="login-form" action="/login">
+    <form class="logsignform" id="login-form">
       <label class="labelform" for="email">Email:</label>
       <input class="inputemform1" type="email" id="email" name="email" required>
 
       <label class="labelform" for="password">Password:</label>
       <input class="inputemform1" type="password" id="password" name="password" required>
-      <div id="password-error" class="error-message"></div>
+      <div id="login-error" class="error-message" style="color: red;"></div>
 
       <button class="buttonform" type="submit">Login</button>
     </form>
     <p class="pform">Don't have an account? <a href="./Signup1.ejs">Sign up</a></p>
   </div>
 
-  <script src="/js/Javaa.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#login-form').submit(function(event) {
+        event.preventDefault();
+
+        const email = $('#email').val();
+        const password = $('#password').val();
+
+        $.ajax({
+          url: '/login',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ email, password }),
+          success: function(response) {
+            $('#login-error').text(''); // Clear any previous error message
+            const successMessage = $('<div>').text(response.message).css('color', 'green');
+            $('body').append(successMessage);
+            setTimeout(() => {
+              window.location.href = './index.ejs'; // Redirect to dashboard or home page
+            }, 1000);
+          },
+          error: function(jqXHR) {
+            $('#login-error').text('Invalid email or password. Please try again.');
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </html>
